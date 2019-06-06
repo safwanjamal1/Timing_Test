@@ -66,26 +66,24 @@ void GPS_data() {
     printf("%d\r\n",myGPS.seconds);
     int_time = asUnixTime(myGPS.year+2000, myGPS.month, myGPS.day, myGPS.hour, myGPS.minute, myGPS.seconds);
     whattime=time(NULL);
-    int received=0;
+    
     do{
         c = myGPS.read();   //queries the GPS
+        //if (c) { printf("%c", c); }
         //check if we recieved a new message from GPS, if so, attempt to parse it,
         if ( myGPS.newNMEAreceived() ) {
             printf("new nmea received\r\n");
-            if ( !myGPS.parse(myGPS.lastNMEA()) )
-                continue;
-
-                else{
+            if ( myGPS.parse(myGPS.lastNMEA()) ){
                     int_time = asUnixTime(myGPS.year+2000, myGPS.month, myGPS.day, myGPS.hour, myGPS.minute, myGPS.seconds);
-                    received++;
-                }
 
-            if (UpdateTime) {
-                set_time(int_time);
-                UpdateTime = false;
-            }  
+                if (UpdateTime) {
+                    set_time(int_time);
+                    UpdateTime = false;
+                }  
+                break;
+            }
         }
-    }while(!received);
+    }while( !myGPS.newNMEAreceived() );
     
     /*
     whattime = time(NULL);
@@ -110,11 +108,11 @@ int main()
     myGPS.sendCommand(PMTK_AWAKE);
     pc.printf("Wake Up GPS...\r\n");
     wait(1);
-    //myGPS.sendCommand(PMTK_SET_BAUD_57600);
-    //pc.printf("Set GPS Baud Rate to 57600...\r\n");
+    myGPS.sendCommand(PMTK_SET_BAUD_57600);
+    pc.printf("Set GPS Baud Rate to 57600...\r\n");
     myGPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
     pc.printf("Set RM Message Format Only...\r\n");
-    myGPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
+    myGPS.sendCommand(PMTK_SET_NMEA_UPDATE_10HZ);
     pc.printf("Set 10Hz Message Update Rate...\r\n");
     myGPS.sendCommand(PGCMD_NOANTENNA);
     pc.printf("Turn Off Antenna Messages...\r\n");
@@ -151,14 +149,14 @@ int main()
 
 
     // call read_sensors 1 every second, automatically defering to the eventThread
-    Ticker GPSTicker;
-    Ticker ReadTicker;
+    //Ticker GPSTicker;
+    //Ticker ReadTicker;
 
-    GPSTicker.attach(eventQueue.event(&GPS_data), 1.000005f);
-    ReadTicker.attach(printfQueue.event(&Print_Sensors), 1.000005f);
+    //GPSTicker.attach(eventQueue.event(&GPS_data), 1.000005f);
+    //ReadTicker.attach(printfQueue.event(&Print_Sensors), 1.000005f);
 
-    //PPS.rise(eventQueue.event(&GPS_data));
-    //PPS.fall(printfQueue.event(&Read_Sensors));
+    PPS.rise(eventQueue.event(&GPS_data));
+    PPS.fall(printfQueue.event(&Print_Sensors));
     
     wait(osWaitForever);
 }
