@@ -23,8 +23,8 @@ EventQueue eventQueue;
 Timer t;
 time_t whattime;
 
-int int_time=0, int_count=0;
-int64_t usTime1 = 0, usTime2 = 0, usDeltaTime = 0;
+int int_time=0;
+int64_t usTime1 = 0;
 bool UpdateTime = true;
 
 void Detect1PPS() {
@@ -48,8 +48,8 @@ time_t asUnixTime(int year, int mon, int mday, int hour, int min, int sec) {
 /* Prints to the serial console */
 void Print_Sensors() {
     // this runs in the lower priority thread
-    pc.printf("%d ", whattime);
-    pc.printf("%d ", int_time);
+    //pc.printf("%d ", whattime);
+    //pc.printf("%d ", int_time);
     pc.printf("%lld \r\n", usTime1);
 }
 
@@ -61,25 +61,29 @@ void Read_Sensors() {
 //Collects and parses GPS data
 //This runs in the high priority thread
 void GPS_data() {
+    //Logs the us timer right after the pps triggers and resets it.
     usTime1 = t.read_us();
     t.reset();
+    /*Eventually will update uc rtc
     printf("%d\r\n",myGPS.seconds);
     int_time = asUnixTime(myGPS.year+2000, myGPS.month, myGPS.day, myGPS.hour, myGPS.minute, myGPS.seconds);
     whattime=time(NULL);
-    
+    */
+
     do{
         c = myGPS.read();   //queries the GPS
         //if (c) { printf("%c", c); }
         //check if we recieved a new message from GPS, if so, attempt to parse it,
         if ( myGPS.newNMEAreceived() ) {
-            printf("new nmea received\r\n");
             if ( myGPS.parse(myGPS.lastNMEA()) ){
-                    int_time = asUnixTime(myGPS.year+2000, myGPS.month, myGPS.day, myGPS.hour, myGPS.minute, myGPS.seconds);
-
+                //    int_time = asUnixTime(myGPS.year+2000, myGPS.month, myGPS.day, myGPS.hour, myGPS.minute, myGPS.seconds);
+                //Set the uc rtc after succesfully receiving first sentence.
+                /*
                 if (UpdateTime) {
                     set_time(int_time);
                     UpdateTime = false;
-                }  
+                }
+                */  
                 break;
             }
         }
@@ -102,11 +106,12 @@ int main()
 {
     myGPS.begin(9600);
     
-    //myGPS.sendCommand(PMTK_STANDBY);
-    pc.printf("Entering GPS Standby...\r\n");
-    wait(1);
+
     myGPS.sendCommand(PMTK_AWAKE);
     pc.printf("Wake Up GPS...\r\n");
+    wait(1);
+    myGPS.sendCommand(PMTK_STANDBY);
+    pc.printf("Entering GPS Standby...\r\n");
     wait(1);
     myGPS.sendCommand(PMTK_SET_BAUD_57600);
     pc.printf("Set GPS Baud Rate to 57600...\r\n");
@@ -121,7 +126,6 @@ int main()
     t.reset();
     t.start();
     pc.printf("Timer Reset and Started...\r\n");
-    set_time(1);
     /*
     do{
         UpdateTime = true;
