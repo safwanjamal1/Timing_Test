@@ -70,6 +70,7 @@ void GPS_data() {
     whattime=time(NULL);
     */
 
+    /*
     do{
         c = myGPS.read();   //queries the GPS
         //if (c) { printf("%c", c); }
@@ -78,17 +79,16 @@ void GPS_data() {
             if ( myGPS.parse(myGPS.lastNMEA()) ){
                 //    int_time = asUnixTime(myGPS.year+2000, myGPS.month, myGPS.day, myGPS.hour, myGPS.minute, myGPS.seconds);
                 //Set the uc rtc after succesfully receiving first sentence.
-                /*
                 if (UpdateTime) {
                     set_time(int_time);
                     UpdateTime = false;
-                }
-                */  
+                } 
                 break;
             }
         }
     }while( !myGPS.newNMEAreceived() );
-    
+    */
+
     /*
     whattime = time(NULL);
     usTime2 = t.read_high_resolution_us();
