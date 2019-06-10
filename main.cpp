@@ -1,5 +1,6 @@
 #include "mbed.h"
 #include "MBed_Adafruit_GPS.h"
+#include "XNucleoIKS01A2.h"
 
 //Prints an error message location if fatal error occurs.
 #define MBED_CONF_PLATFORM_ERROR_FILENAME_CAPTURE_ENABLED 0
@@ -8,6 +9,22 @@
 Serial pc(USBTX, USBRX);
 InterruptIn PPS(A1, PullNone);
 DigitalOut led(LED1);
+
+/* Sensor Board Variables */
+uint8_t id;
+float temp1, temp2, humid1, humid2;
+char buffer1[32], buffer2[32], buffer3[32], buffer4[32];
+int32_t axes1[3], axes2[3], axes3[3], axes4[3];
+
+/* Instantiate the expansion board */
+static XNucleoIKS01A2 *mems_expansion_board = XNucleoIKS01A2::instance(D14, D15, D4, D5);
+
+/* Retrieve the composing elements of the expansion board */
+static LSM303AGRMagSensor *magnetometer = mems_expansion_board->magnetometer;
+static HTS221Sensor *hum_temp = mems_expansion_board->ht_sensor;
+static LPS22HBSensor *press_temp = mems_expansion_board->pt_sensor;
+static LSM6DSLSensor *acc_gyro = mems_expansion_board->acc_gyro;
+static LSM303AGRAccSensor *accelerometer = mems_expansion_board->accelerometer;
 
 //Configures GPS.
 Serial * gps_Serial = new Serial(D1,D0); //serial object for use w/ GPS
@@ -26,6 +43,42 @@ int int_GPStime=0;
 time_t whattime;
 bool UpdateTime = true;
 
+/* Helper function for printing floats & doubles */
+static char *print_double(char* str, double v, int decimalDigits=2)
+{
+    int i = 1;
+    int intPart, fractPart;
+    int len;
+    char *ptr;
+
+    /* prepare decimal digits multiplicator */
+    for (;decimalDigits!=0; i*=10, decimalDigits--);
+
+    /* calculate integer & fractinal parts */
+    intPart = (int)v;
+    fractPart = (int)((v-(double)(int)v)*i);
+
+    /* fill in integer part */
+    sprintf(str, "%i.", intPart);
+
+    /* prepare fill in of fractional part */
+    len = strlen(str);
+    ptr = &str[len];
+
+    /* fill in leading fractional zeros */
+    for (i/=10;i>1; i/=10, ptr++) {
+        if (fractPart >= i) {
+        break;
+        }
+        *ptr = '0';
+    }
+
+    /* fill in (rest of) fractional part */
+    sprintf(ptr, "%i", fractPart);
+
+    return str;
+}
+
 /* Converts standard time into Epoch time. Could delete this if no longer needed.*/
 time_t asUnixTime(int year, int mon, int mday, int hour, int min, int sec) {
     struct tm   t;
@@ -40,14 +93,31 @@ time_t asUnixTime(int year, int mon, int mday, int hour, int min, int sec) {
     return mktime(&t);          // returns seconds elapsed since January 1, 1970 (begin of the Epoch)
 }
 
+void read_sensors(){
+    hum_temp->get_temperature(&temp1);
+    hum_temp->get_humidity(&humid1);
+    press_temp->get_temperature(&temp2);
+    press_temp->get_pressure(&humid2);
+    magnetometer->get_m_axes(axes1);
+    accelerometer->get_x_axes(axes2);
+    acc_gyro->get_x_axes(axes3);
+    acc_gyro->get_g_axes(axes4);
+}
 /* Prints to the serial console */
 //This runs in the low priority thread
 void Print_Sensors() {
+    read_sensors();
     //Next two lines print current uc and gps time, possibly disadvantageous to do this rather than save them in variables
     //when us timer is saved/reset
     pc.printf("%d ", time(NULL));
     pc.printf("%d ", asUnixTime(myGPS.year+2000, myGPS.month, myGPS.day, myGPS.hour, myGPS.minute, myGPS.seconds));
-    pc.printf("%lld \r\n", usTime1);
+    pc.printf("%lld", usTime1);
+    pc.printf("%7s %s ", print_double(buffer1, temp1), print_double(buffer2, humid1));
+    pc.printf("%7s %s ", print_double(buffer3, temp2), print_double(buffer4, humid2));
+    pc.printf("%6ld %6ld %6ld ", axes1[0], axes1[1], axes1[2]);
+    pc.printf("%6ld %6ld %6ld", axes2[0], axes2[1], axes2[2]);
+    pc.printf("%6ld %6ld %6ld", axes3[0], axes3[1], axes3[2]);
+    pc.printf("%6ld %6ld %6ld\r\n", axes4[0], axes4[1], axes4[2]);
 }
 
 //Collects and parses GPS data
@@ -96,14 +166,23 @@ int main()
     myGPS.sendCommand(PGCMD_NOANTENNA);
     pc.printf("Turn Off Antenna Messages...\r\n");
 
+    /* Enable all sensors */
+    hum_temp->enable();
+    press_temp->enable();
+    magnetometer->enable();
+    accelerometer->enable();
+    acc_gyro->enable_x();
+    acc_gyro->enable_g();
+    wait(1);
+
     /* resets and starts the timer */
     t.reset();
     t.start();
     pc.printf("Timer Reset and Started...\r\n");
 
     //Prints headers for each measurement.
-    pc.printf("\r\nuC GPS uS\r\n");
-    
+    pc.printf("\r\nuC GPS uS TEP1 HUM TEP2 PRES MAGX MAGY MAGZ AC1X AC1Y AC1Z AC2X AC2Y AC2Z GYRX GYRY GYRZ\r\n");
+
     // normal priority thread for other events
     Thread eventThread(osPriorityHigh);
     eventThread.start(callback(&GPSQueue, &EventQueue::dispatch_forever));
@@ -113,14 +192,14 @@ int main()
     printfThread.start(callback(&printfQueue, &EventQueue::dispatch_forever));
 
     // call read_sensors 1 every second, automatically defering to the eventThread
-    //Ticker GPSTicker;
-    //Ticker ReadTicker;
+    Ticker GPSTicker;
+    Ticker ReadTicker;
 
-    //GPSTicker.attach(GPSQueue.event(&GPS_data), 1.000005f);
-    //ReadTicker.attach(printfQueue.event(&Print_Sensors), 1.000005f);
+    GPSTicker.attach(GPSQueue.event(&GPS_data), 1.000005f);
+    ReadTicker.attach(printfQueue.event(&Print_Sensors), 1.000005f);
 
-    PPS.rise(GPSQueue.event(&GPS_data));
-    PPS.fall(printfQueue.event(&Print_Sensors));
+    //PPS.rise(GPSQueue.event(&GPS_data));
+    //PPS.fall(printfQueue.event(&Print_Sensors));
     
     wait(osWaitForever);
 }
