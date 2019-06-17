@@ -1,0 +1,3 @@
+BUILD\NUCLEO_F401RE\ARMC6\mbed-os\cmsis\TARGET_CORTEX_M\TOOLCHAIN_ARM\except.o: \
+  mbed-os\cmsis\TARGET_CORTEX_M\TOOLCHAIN_ARM\except.S \
+  BUILD\NUCLEO_F401RE\ARMC6\mbed_config.h

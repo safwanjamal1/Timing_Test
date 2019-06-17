@@ -1,0 +1,307 @@
+[
+    {
+        "module": "HTS221\\HTS221Sensor.o", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 0, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 1200
+        }
+    }, 
+    {
+        "module": "HTS221\\HTS221_driver.o", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 0, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 921
+        }
+    }, 
+    {
+        "module": "LPS22HB\\LPS22HBSensor.o", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 0, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 1124
+        }
+    }, 
+    {
+        "module": "LPS22HB\\LPS22HB_driver.o", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 0, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 764
+        }
+    }, 
+    {
+        "module": "LSM303AGR\\LSM303AGRAccSensor.o", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 0, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 1797
+        }
+    }, 
+    {
+        "module": "LSM303AGR\\LSM303AGRMagSensor.o", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 0, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 865
+        }
+    }, 
+    {
+        "module": "LSM303AGR\\LSM303AGR_acc_driver.o", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 0, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 1086
+        }
+    }, 
+    {
+        "module": "LSM303AGR\\LSM303AGR_mag_driver.o", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 0, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 374
+        }
+    }, 
+    {
+        "module": "LSM6DSL\\LSM6DSLSensor.o", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 0, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 3032
+        }
+    }, 
+    {
+        "module": "LSM6DSL\\LSM6DSL_acc_gyro_driver.o", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 0, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 894
+        }
+    }, 
+    {
+        "module": "MBed_Adafruit-GPS-Library\\MBed_Adafruit_GPS.o", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 251, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 1260
+        }
+    }, 
+    {
+        "module": "X_NUCLEO_IKS01A2\\XNucleoIKS01A2.o", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 4, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 390
+        }
+    }, 
+    {
+        "module": "[lib]\\c_w.l", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 348, 
+            ".data": 16, 
+            ".bss-delta": 0, 
+            ".text": 15985
+        }
+    }, 
+    {
+        "module": "[lib]\\fz_wm.l", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 0, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 3618
+        }
+    }, 
+    {
+        "module": "[lib]\\libcppabi_w.l", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 0, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 44
+        }
+    }, 
+    {
+        "module": "[lib]\\m_wm.l", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 0, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 1094
+        }
+    }, 
+    {
+        "module": "anon$$obj.o", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 1280, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 32
+        }
+    }, 
+    {
+        "module": "main.o", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 539, 
+            ".bss": 865, 
+            ".data": 1, 
+            ".bss-delta": 8, 
+            ".text": 3851
+        }
+    }, 
+    {
+        "module": "mbed-os\\cmsis", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 0, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 1021
+        }
+    }, 
+    {
+        "module": "mbed-os\\components", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 0, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 145
+        }
+    }, 
+    {
+        "module": "mbed-os\\drivers", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 52, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 3041
+        }
+    }, 
+    {
+        "module": "mbed-os\\events", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 0, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 1454
+        }
+    }, 
+    {
+        "module": "mbed-os\\features", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 0, 
+            ".data": 0, 
+            ".bss-delta": 0, 
+            ".text": 18
+        }
+    }, 
+    {
+        "module": "mbed-os\\hal", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 66, 
+            ".data": 4, 
+            ".bss-delta": 0, 
+            ".text": 2028
+        }
+    }, 
+    {
+        "module": "mbed-os\\platform", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 317, 
+            ".data": 80, 
+            ".bss-delta": 0, 
+            ".text": 7785
+        }
+    }, 
+    {
+        "module": "mbed-os\\rtos", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 6754, 
+            ".data": 168, 
+            ".bss-delta": 0, 
+            ".text": 12972
+        }
+    }, 
+    {
+        "module": "mbed-os\\targets", 
+        "size": {
+            ".data-delta": 0, 
+            ".text-delta": 0, 
+            ".bss": 949, 
+            ".data": 4, 
+            ".bss-delta": 0, 
+            ".text": 16181
+        }
+    }, 
+    {
+        "summary": {
+            "static_ram": 11159, 
+            "total_flash_delta": 539, 
+            "static_ram_delta": 8, 
+            "total_flash": 83249
+        }
+    }
+]
