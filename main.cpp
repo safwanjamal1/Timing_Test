@@ -1,6 +1,7 @@
 #include "mbed.h"
 #include "MBed_Adafruit_GPS.h"
 #include "XNucleoIKS01A2.h"
+#include "stm32f4xx_hal_gpio.h"
 
 //Prints an error message location if fatal error occurs.
 #define MBED_CONF_PLATFORM_ERROR_FILENAME_CAPTURE_ENABLED 0
@@ -183,15 +184,7 @@ int main()
     acc_gyro->enable_g();
     wait(1);
 
-    /* Query CPU Clock */
-    pc.printf("CPU SystemCoreClock is %d Hz\r\n", SystemCoreClock);
-    pc.printf("Get Sysclk Source: %d\r\n", __HAL_RCC_GET_SYSCLK_SOURCE());
-    pc.printf("HSI Clock Status: %d\r\n", RCC_OSCILLATORTYPE_HSI);
-    pc.printf("HSE Clock Status: %d\r\n", RCC_OSCILLATORTYPE_HSE);
-    pc.printf("LSE Clock Status: %d\r\n", RCC_OSCILLATORTYPE_LSE);
-    pc.printf("LSI Clock Status: %d\r\n", RCC_OSCILLATORTYPE_LSI);
-    pc.printf("PLL Clock Status: %d\r\n", RCC_SYSCLKSOURCE_STATUS_PLLCLK);
-    pc.printf("PLL Clock Source: %d\r\n", __HAL_RCC_GET_PLL_OSCSOURCE());
+    //HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_LSE, RCC_MCODIV_1);
 
     /* resets and starts the timer */
     t.reset();

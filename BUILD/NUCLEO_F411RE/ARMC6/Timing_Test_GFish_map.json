@@ -190,11 +190,11 @@
         "module": "main.o", 
         "size": {
             ".data-delta": 0, 
-            ".text-delta": 539, 
+            ".text-delta": -12, 
             ".bss": 865, 
             ".data": 1, 
-            ".bss-delta": 8, 
-            ".text": 3851
+            ".bss-delta": 0, 
+            ".text": 3508
         }
     }, 
     {
@@ -289,7 +289,7 @@
         "module": "mbed-os\\targets", 
         "size": {
             ".data-delta": 0, 
-            ".text-delta": 0, 
+            ".text-delta": -552, 
             ".bss": 949, 
             ".data": 4, 
             ".bss-delta": 0, 
@@ -299,9 +299,9 @@
     {
         "summary": {
             "static_ram": 11159, 
-            "total_flash_delta": 539, 
-            "static_ram_delta": 8, 
-            "total_flash": 83249
+            "total_flash_delta": -564, 
+            "static_ram_delta": 0, 
+            "total_flash": 82906
         }
     }
 ]
