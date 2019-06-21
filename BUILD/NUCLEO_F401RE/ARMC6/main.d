@@ -234,4 +234,5 @@ BUILD\NUCLEO_F401RE\ARMC6\main.o: main.cpp \
   HTS221\ST_INTERFACES\Sensors\MagneticSensor.h LPS22HB\LPS22HBSensor.h \
   LPS22HB\LPS22HB_driver.h HTS221\ST_INTERFACES\Sensors\PressureSensor.h \
   LSM6DSL\LSM6DSLSensor.h LSM6DSL\LSM6DSL_acc_gyro_driver.h \
-  HTS221\ST_INTERFACES\Sensors\GyroSensor.h
+  HTS221\ST_INTERFACES\Sensors\GyroSensor.h \
+  mbed-os\targets\TARGET_STM\TARGET_STM32F4\device\stm32f4xx_hal_gpio.h

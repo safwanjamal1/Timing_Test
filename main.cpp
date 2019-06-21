@@ -158,14 +158,14 @@ void GPS_data() {
 // main() runs in its own thread in the OS
 int main()
 {
-    myGPS.begin(9600);
+    myGPS.begin(57600);
 
     myGPS.sendCommand(PMTK_AWAKE);
     pc.printf("Wake Up GPS...\r\n");
     wait(1);
-    myGPS.sendCommand(PMTK_STANDBY);
-    pc.printf("Entering GPS Standby...\r\n");
-    wait(1);
+    //myGPS.sendCommand(PMTK_STANDBY);
+    //pc.printf("Entering GPS Standby...\r\n");
+    //wait(1);
     myGPS.sendCommand(PMTK_SET_BAUD_57600);
     pc.printf("Set GPS Baud Rate to 57600...\r\n");
     myGPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
