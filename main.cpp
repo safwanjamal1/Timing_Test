@@ -1,7 +1,10 @@
 #include "mbed.h"
 #include "MBed_Adafruit_GPS.h"
 #include "XNucleoIKS01A2.h"
-#include "stm32f4xx_hal_gpio.h"
+#include <cstdio>
+#include <cmath>
+
+#define PI 3.14159265
 
 //Prints an error message location if fatal error occurs.
 #define MBED_CONF_PLATFORM_ERROR_FILENAME_CAPTURE_ENABLED 0
@@ -39,15 +42,14 @@ EventQueue GPSQueue;
 /* Defines the timer */
 Timer t;
 int64_t usTime1 = 0;
-int64_t usTime2 = 0;
 
-int int_GPStime=0, int_count=0, sense_count=0;
+int int_GPStime=0;
 time_t whattime;
 bool UpdateTime = true;
 
 /* Helper function for printing floats & doubles */
 static char *print_double(char* str, double v, int decimalDigits=2)
-{
+{ 
     int i = 1;
     int intPart, fractPart;
     int len;
@@ -109,25 +111,45 @@ void read_sensors(){
 //This runs in the low priority thread
 void Print_Sensors() {
     read_sensors();
-    sense_count++;
     //Next two lines print current uc and gps time, possibly disadvantageous to do this rather than save them in variables
     //when us timer is saved/reset
-    if (sense_count > 1)
-    {
-        pc.printf("%d ", time(NULL));
-        pc.printf("%d ", int_GPStime);
-        pc.printf("%lld", usTime1);
-        pc.printf("%7s %s ", print_double(buffer1, temp1), print_double(buffer2, humid1));
-        pc.printf("%7s %s ", print_double(buffer3, temp2), print_double(buffer4, humid2));
-        pc.printf("%6ld %6ld %6ld ", axes1[0], axes1[1], axes1[2]);
-        pc.printf("%6ld %6ld %6ld", axes2[0], axes2[1], axes2[2]);
-        pc.printf("%6ld %6ld %6ld", axes3[0], axes3[1], axes3[2]);
-        pc.printf("%6ld %6ld %6ld\r\n", axes4[0], axes4[1], axes4[2]);
+    pc.printf("%d ", time(NULL));
+    pc.printf("%d ", asUnixTime(myGPS.year+2000, myGPS.month, myGPS.day, myGPS.hour, myGPS.minute, myGPS.seconds));
+    pc.printf("%lld", usTime1);
+    pc.printf("%7s %s ", print_double(buffer1, temp1), print_double(buffer2, humid1));
+    pc.printf("%7s %s ", print_double(buffer3, temp2), print_double(buffer4, humid2));
+    pc.printf("%6ld %6ld %6ld  ", axes1[0], axes1[1], axes1[2]);
+    pc.printf("%6ld %6ld %6ld  ", axes2[0], axes2[1], axes2[2]);
+    pc.printf("%6ld %6ld %6ld  ", axes3[0], axes3[1], axes3[2]);
+    pc.printf("%6ld %6ld %6ld  ", axes4[0], axes4[1], axes4[2]);
+
+    long xGauss = axes1[0] * 0.48828125;
+    long yGauss = axes1[1] * 0.48828125;
+
+    long D;
+
+    if(xGauss == 0){
+        if(yGauss > 0)
+            D = 0;
+
+        else
+            D = 90;
     }
-    else
-    {
-        UpdateTime = true;
+
+    else{
+        D = atan((double)yGauss/xGauss)*(180/PI);    
     }
+
+    if(D>360)
+        D = D-360;
+
+    else if(D < 0)
+        D = D+360;
+    
+    pc.printf("%ld\r\n", D);
+
+/* asdasdasdasd */
+    
 }
 
 //Collects and parses GPS data
@@ -153,19 +175,21 @@ void GPS_data() {
             }
         }
     }while( !myGPS.newNMEAreceived() );
+    
 }
 
 // main() runs in its own thread in the OS
 int main()
 {
     myGPS.begin(57600);
+    
 
     myGPS.sendCommand(PMTK_AWAKE);
     pc.printf("Wake Up GPS...\r\n");
     wait(1);
-    //myGPS.sendCommand(PMTK_STANDBY);
-    //pc.printf("Entering GPS Standby...\r\n");
-    //wait(1);
+    myGPS.sendCommand(PMTK_STANDBY);
+    pc.printf("Entering GPS Standby...\r\n");
+    wait(1);
     myGPS.sendCommand(PMTK_SET_BAUD_57600);
     pc.printf("Set GPS Baud Rate to 57600...\r\n");
     myGPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
@@ -184,28 +208,13 @@ int main()
     acc_gyro->enable_g();
     wait(1);
 
-    //HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_LSE, RCC_MCODIV_1);
-
     /* resets and starts the timer */
     t.reset();
     t.start();
     pc.printf("Timer Reset and Started...\r\n");
 
-    /* Wait for GPS to Sync and uc to start up and properly sync GPS time. */
-    do{
-        UpdateTime = true;
-        GPS_data();   //queries the GPS
-        pc.printf("Waiting for GPS Fix...%d\r\n",myGPS.fix);
-        pc.printf("GPS Time...%d\r\n",int_GPStime);
-        pc.printf("Micro Time...%d\r\n",time(NULL));
-        pc.printf("Counter Number...%d\r\n\r\n", int_count);
-        int_count++;
-
-    }while(myGPS.fix == false);
-    UpdateTime = false;
-
     //Prints headers for each measurement.
-    pc.printf("\r\nuC GPS uS TEP1 HUM TEP2 PRES MAGX MAGY MAGZ AC1X AC1Y AC1Z AC2X AC2Y AC2Z GYRX GYRY GYRZ\r\n");
+    pc.printf("\r\nuC GPS uS TEP1 HUM TEP2 PRES MAGX MAGY MAGZ AC1X AC1Y AC1Z AC2X AC2Y AC2Z GYRX GYRY GYRZ HEADING\r\n");
 
     // normal priority thread for other events
     Thread eventThread(osPriorityHigh);
@@ -216,14 +225,15 @@ int main()
     printfThread.start(callback(&printfQueue, &EventQueue::dispatch_forever));
 
     // call read_sensors 1 every second, automatically defering to the eventThread
-    //Ticker GPSTicker;
-    //Ticker ReadTicker;
+    Ticker GPSTicker;
+    Ticker ReadTicker;
 
-    //GPSTicker.attach(GPSQueue.event(&GPS_data), 1.000005f);
-    //ReadTicker.attach(printfQueue.event(&Print_Sensors), 1.000005f);
+    GPSTicker.attach(GPSQueue.event(&GPS_data), 1.000005f);
+    ReadTicker.attach(printfQueue.event(&Print_Sensors), 1.000005f);
 
-    PPS.rise(GPSQueue.event(&GPS_data));
-    PPS.fall(printfQueue.event(&Print_Sensors));
+    //PPS.rise(GPSQueue.event(&GPS_data));
+    //PPS.fall(printfQueue.event(&Print_Sensors));
     
     wait(osWaitForever);
 }
+
